@@ -103,8 +103,9 @@ target(init: "Initialisation for maven deploy/install") {
 								
 								dependency {
 									groupId depGroup
-									artifactId depName
+									artifactId toArtifactName(depName)
 									version depVersion
+                                    type 'zip'
 								}							
 							}
 						}					
@@ -121,6 +122,14 @@ target(mavenInstall:"Installs a plugin or application into your local Maven cach
 	def deployFile = plugin ? new File(pluginZip) : grailsSettings.projectWarFile
 	def ext = plugin ? "zip" : "war"
 	installOrDeploy(deployFile, ext, false)
+}
+
+private toArtifactName(String depName) {
+    depName.replaceAll(/(.*?)([A-Z]?)/) {match, before, String capitalLetter->
+        if(capitalLetter) "$before-${capitalLetter.toLowerCase()}"
+        else if(before) before
+        else ''
+    }
 }
 
 private generateChecksum(File file) {
